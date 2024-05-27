@@ -1,28 +1,19 @@
-router.get('/callback', async (req, res) => {
-  const code = req.query.code || null;
+const express = require('express');
+const router = express.Router();
+const axios = require('axios');
+const querystring = require('querystring');
 
-  const authOptions = {
-    url: 'https://accounts.spotify.com/api/token',
-    form: {
-      code: code,
-      redirect_uri: redirect_uri,
-      grant_type: 'authorization_code'
-    },
-    headers: {
-      'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64'))
-    },
-    json: true
-  };
+router.get('/login', (req, res) => {
+    const scope = 'user-read-private user-read-email';
+    const params = querystring.stringify({
+        response_type: 'code',
+        client_id: process.env.SPOTIFY_CLIENT_ID,
+        scope: scope,
+        redirect_uri: process.env.REDIRECT_URI,
+    });
 
-  request.post(authOptions, (error, response, body) => {
-    if (!error && response.statusCode === 200) {
-      const access_token = body.access_token;
-      const refresh_token = body.refresh_token;
-
-      res.redirect(`/#/access_token=${access_token}&refresh_token=${refresh_token}`);
-    } else {
-      res.redirect('/#/error/invalid_token');
-    }
-  });
+    res.redirect(`https://accounts.spotify.com/authorize?${params}`);
 });
+
+module.exports = router;
 

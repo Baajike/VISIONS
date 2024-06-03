@@ -1,18 +1,36 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
-const querystring = require('querystring');
 
-router.get('/login', (req, res) => {
-    const scope = 'user-read-private user-read-email';
-    const params = querystring.stringify({
-        response_type: 'code',
-        client_id: process.env.SPOTIFY_CLIENT_ID,
-        scope: scope,
-        redirect_uri: process.env.REDIRECT_URI,
-    });
+// Mock Spotify data for demonstration
+const mockSpotifyData = [
+    {
+        id: 1,
+        name: 'Song 1',
+        artist: 'Artist 1',
+        album: 'Album 1'
+    },
+    {
+        id: 2,
+        name: 'Song 2',
+        artist: 'Artist 2',
+        album: 'Album 2'
+    }
+];
 
-    res.redirect(`https://accounts.spotify.com/authorize?${params}`);
+// Route to get all songs (mock data for now)
+router.get('/songs', (req, res) => {
+    res.json(mockSpotifyData);
+});
+
+// Route to get a specific song by ID (mock data for now)
+router.get('/songs/:id', (req, res) => {
+    const songId = parseInt(req.params.id, 10);
+    const song = mockSpotifyData.find(s => s.id === songId);
+    if (song) {
+        res.json(song);
+    } else {
+        res.status(404).send('Song not found');
+    }
 });
 
 module.exports = router;

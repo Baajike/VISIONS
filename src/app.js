@@ -1,28 +1,31 @@
+require('dotenv').config();
+console.log('MONGO_URI:', process.env.MONGO_URI); // Add this line
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-
-// Load environment variables
-dotenv.config();
-
-const app = express();
-const port = process.env.PORT || 3000;
-
-// Middleware to parse JSON
-app.use(express.json());
-
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((error) => console.error('Failed to connect to MongoDB', error));
-
-// Import routes
 const spotifyRoutes = require('./routes/spotifyRoutes');
 
-// Use routes
+const app = express();
+const PORT = 4000;
+
+// Connect to MongoDB
+const mongoUri = process.env.MONGO_URI;
+mongoose.connect(mongoUri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch((error) => {
+  console.error('Failed to connect to MongoDB', error);
+});
+
+// Middleware
+app.use(express.json());
+
+// Routes
 app.use('/api/spotify', spotifyRoutes);
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
